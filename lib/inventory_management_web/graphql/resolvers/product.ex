@@ -1,17 +1,17 @@
 defmodule ProductResolvers do
   alias InventoryManagement.{Products}
-  alias InventoryManagementWeb.Graphql.Helpers
 
   def list_products(_parent, args, _context) do
     products = Products.list_all_products(args)
+    totalCount = length(products)
 
     edges =
       products
       |> Enum.map(&pagination_edge/1)
 
-    page_info = page_info(products, 2, args.filter.limit, args.filter.offset)
+    page_info = page_info(products, totalCount, args.filter.limit, args.filter.offset)
 
-    %{edges: edges, page_info: page_info}
+    {:ok,%{edges: edges, page_info: page_info}}
   end
 
   defp pagination_edge(item) do

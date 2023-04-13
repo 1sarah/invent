@@ -17,11 +17,11 @@ defmodule InventoryManagementWeb.Graphql.Types.Inventory do
 
   object :product_edge do
     field(:node, :product_details)
-    field(:cursor, :string!)
+    field(:cursor, :string)
   end
 
   object :product_connection do
-    field(:totalCount, :integer)
+    field(:total_count, :integer)
     field(:edges, list_of(:product_edge))
     field(:page_info, :page_info)
   end
