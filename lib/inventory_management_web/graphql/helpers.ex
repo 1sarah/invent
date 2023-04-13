@@ -19,7 +19,7 @@ defmodule InventoryManagementWeb.Graphql.Helpers do
   end
 
   defp lock_user(user) do
-     Users.update_user(user, %{
+    Users.update_user(user, %{
       # active: false,
       updatedBy: "system",
       updated_at: NaiveDateTime.local_now()
@@ -36,6 +36,4 @@ defmodule InventoryManagementWeb.Graphql.Helpers do
 
     %{total_count: total_count, end_cursor: end_cursor, has_next_page: has_next_page}
   end
-
-
 end

@@ -7,6 +7,13 @@ defmodule InventoryManagementWeb.Graphql.Types.Utils do
     field(:success, non_null(:boolean))
   end
 
+  object :page_info do
+    field(:has_next_page, :boolean!)
+    field(:has_previous_page, :boolean!)
+    field(:start_cursor, :string!)
+    field(:end_cursor, :string!)
+  end
+
   enum :sort_order do
     value(:asc)
     value(:desc)

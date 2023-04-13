@@ -15,11 +15,22 @@ defmodule InventoryManagementWeb.Graphql.Types.Inventory do
     )
   end
 
-  @desc "product Result"
-  object :product_result do
-    import_fields(:result_meta)
-    field(:product, non_null(list_of(non_null(:product_details))))
+  object :product_edge do
+    field(:node, :product_details)
+    field(:cursor, :string!)
   end
+
+  object :product_connection do
+    field(:totalCount, :integer)
+    field(:edges, list_of(:product_edge))
+    field(:page_info, :page_info)
+  end
+
+  # @desc "product Result"
+  # object :product_result do
+  #   import_fields(:result_meta)
+  #   field(:product, non_null(list_of(non_null(:product_details))))
+  # end
 
   @desc "Product inputs"
   input_object :product_inputs do
