@@ -3,13 +3,13 @@ defmodule ProductResolvers do
 
   def list_products(_parent, args, _context) do
     products = Products.list_all_products(args)
-    totalCount = length(products)
+    total_count = length(products)
 
     edges =
       products
       |> Enum.map(&pagination_edge/1)
 
-    page_info = page_info(products, totalCount, args.filter.limit, args.filter.offset)
+    page_info = page_info(products, total_count, args.filter.limit, args.filter.offset)
 
     {:ok,%{edges: edges, page_info: page_info}}
   end
