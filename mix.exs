@@ -56,6 +56,7 @@ defmodule InventoryManagement.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:ecto_sql, "~> 3.8"},
       {:plug_cowboy, "~> 2.5"},
+      {:cors_plug, "~> 3.0"},
       {:hammer, "~> 6.1"}
     ]
   end

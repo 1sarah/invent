@@ -14,7 +14,6 @@ config :inventory_management, Guardian,
   issuer: "inventory_management",
   secret_key: "oj7I16IeHQDm+nnzeYZTtn5+4UcMcGDbMuhtgXjgjS4h2/DbOdJf4osC/aX2Kh6P"
 
-
 # Configures the endpoint
 config :inventory_management, InventoryManagementWeb.Endpoint,
   url: [host: "localhost"],
@@ -60,6 +59,11 @@ config :tailwind,
 config :hammer,
   backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60 * 4, cleanup_interval_ms: 60_000]}
 
+# Configure cors_plug
+config :cors_plug,
+  origin: ["*"],
+  max_age: 86400,
+  methods: ["GET", "POST"]
 
 # Configures Elixir's Logger
 config :logger, :console,
