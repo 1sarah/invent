@@ -21,7 +21,7 @@ defmodule InventoryManagementWeb.Graphql.Types.Inventory do
   end
 
   object :product_connection do
-    field(:total_count, :integer)
+    field(:total_count, :string)
     field(:edges, list_of(:product_edge))
     field(:page_info, :page_info)
   end

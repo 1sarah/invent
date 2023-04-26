@@ -14,8 +14,12 @@ defmodule InventoryManagementWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :graphql do
+    plug(InventoryManagement.Context)
+  end
+
   scope "/" do
-    pipe_through([:api, ])
+    pipe_through([:api,:graphql ])
 
     forward("/graphql", Absinthe.Plug.GraphiQL,
       schema: InventoryManagementWeb.Graphql.Schema,
@@ -47,7 +51,7 @@ defmodule InventoryManagementWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
-      pipe_through :browser
+      pipe_through ([:api,:browser])
 
       live_dashboard "/dashboard", metrics: InventoryManagementWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
