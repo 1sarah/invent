@@ -30,4 +30,11 @@ defmodule InventoryManagementWeb.Graphql.Types.Utils do
     field(:success, :boolean)
     field(:message, :string)
   end
+
+
+  @desc "Group result by month object"
+  object :result_count_by_month do
+    field(:month, :string)
+    field(:count, :integer)
+  end
 end

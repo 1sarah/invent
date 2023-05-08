@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { ADD_PRODUCT, GET_PRODUCTS } from '../queries';
+import { ADD_PRODUCT, GET_PRODUCTS } from '../queries/product';
 
 function AddProductForm() {
   const [name, setName] = useState('');

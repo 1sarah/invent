@@ -100,17 +100,46 @@ defmodule InventoryManagement.Products do
     Product.changeset(product, attrs)
   end
 
-  def list_all_products(args) do
-    args
-    |> Enum.reduce(Product, fn
-      {:order, order}, query ->
-        query |> order_by({^order, :inserted_at})
+  def group_product_by_month do
+    Product
+    |> select([t], %{month: fragment("to_char(?, 'Month')", t.inserted_at), count: count(t.id)})
+    |> group_by([t], fragment("to_char(?, 'Month')", t.inserted_at))
+    |> Repo.one()
+  end
 
-      {:filter, filter}, query ->
-        query |> filter_with(filter)
-    end)
-    # |> where([t], is_nil(t.deleted_at))
-    |> Repo.all()
+  def list_all_products(args) do
+    res =
+      args
+      |> Enum.reduce(Product, fn
+        {:order, order}, query ->
+          query |> order_by({^order, :inserted_at})
+
+        {:filter, filter}, query ->
+          query |> filter_with(filter)
+      end)
+      |> Repo.all()
+
+    filter =
+      args =
+      Map.update!(args, :filter, fn filter ->
+        Map.drop(filter, [:limit])
+      end)
+
+    %{
+      total_count:
+        length(
+          filter
+          |> Enum.reduce(Product, fn
+            {:order, order}, query ->
+              query |> order_by({^order, :inserted_at})
+
+            {:filter, filter}, query ->
+              query |> filter_with(filter)
+          end)
+          |> Repo.all()
+        ),
+      result: res
+    }
   end
 
   defp filter_with(query, filter) do

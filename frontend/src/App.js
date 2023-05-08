@@ -1,17 +1,32 @@
 import React from 'react';
 import { ApolloProvider } from '@apollo/client';
-import client from './client';
-import ProductList from './components/ProductList';
-import AddProductForm from './components/AddProductForm';
+
+import Products from './components/products';
+import {  BrowserRouter as Router, Switch, Route, Link, Routes } from "react-router-dom";
+import Dashboard from './dashboard/dashboard';
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <div>
-        <ProductList />
-        {/* <AddProductForm /> */}
-      </div>
-    </ApolloProvider>
+      
+      <>
+        <nav className="sidebar">
+          <ul>
+            <li><Link to="/">Dashboard</Link></li>
+            <li><Link to="/products">Products</Link></li>
+          </ul>
+        </nav>
+        <div className="main-content">
+     
+          <Routes>
+            <Route exact path="/" element={<Dashboard/>} />
+            <Route path="/products" element={Products} />
+           </Routes>
+       
+        </div>
+        </>
+  
+   
+
   );
 }
 

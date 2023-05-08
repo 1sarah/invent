@@ -1,24 +1,17 @@
 import { gql } from '@apollo/client';
 
 export const GET_PRODUCTS = gql`
- query {
-   getAllProducts (filter: {limit: 2}){
-  # totalCount
-   edges{
-    node{
-      name
-      id
-      price
+query{
+  getAllProducts(filter: {offset: 0,limit: 30}){
+    total
+    product{
+        price
+        name
+        sku
+        id
+      }
     }
-    cursor
-  }
-  pageInfo{
-    hasNextPage
-    endCursor
-    startCursor
-    hasPreviousPage
-  }
-}
+  
 }
 `;
 
@@ -32,6 +25,15 @@ export const ADD_PRODUCT = gql`
     }
   }
 `;
+
+export const GET_PRODUCTS_BY_MONTH = gql`
+ query{
+   getProductByMonth{
+       month
+       count
+     }
+    }
+ `;
 
 const UPDATE_PRODUCT = gql`
   mutation UpdateProduct(
