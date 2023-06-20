@@ -1,0 +1,63 @@
+# Template docker-push
+
+# This template allows you to build and push your docker image to a Docker Hub account.
+# The workflow allows running tests, code linting and security scans on feature branches (as well as master).
+# The docker image will be validated and pushed to the docker registry after the code is merged to master.
+
+# Prerequisites: $DOCKERHUB_USERNAME, $DOCKERHUB_PASSWORD setup as deployment variables
+
+pipelines:
+  branches:
+    dev:
+      - parallel:
+          - step: # define the build pipeline for the tag
+              name: Run test
+              image: elixir
+              services:
+                - postgres
+              script:
+                - mix local.hex --force
+                - mix deps.clean --all --force
+                - mix deps.get --force
+                - mix local.rebar --force
+                - mix ecto.create && mix ecto.migrate --quiet --migrations-path=./apps/masterdata
+                - mix ecto.create && mix ecto.migrate --quiet --migrations-path=./apps/core
+                - mix ecto.create && mix ecto.migrate --quiet --migrations-path=./apps/merchant
+                - mix ecto.create && mix ecto.migrate --quiet --migrations-path=./apps/tms
+
+                - MIX_ENV=test TEST_DB_HOST=postgres TEST_DB_PWD=pass123 mix ecto.create --quiet
+                - MIX_ENV=test TEST_DB_HOST=postgres TEST_DB_PWD=pass123 mix ecto.migrate --quiet --migrations-path=./apps/masterdata
+                - MIX_ENV=test TEST_DB_HOST=postgres TEST_DB_PWD=pass123 mix ecto.migrate --quiet --migrations-path=./apps/core
+                - MIX_ENV=test TEST_DB_HOST=postgres TEST_DB_PWD=pass123 mix ecto.migrate --quiet --migrations-path=./apps/merchant
+                - MIX_ENV=test TEST_DB_HOST=postgres TEST_DB_PWD=pass123 mix ecto.migrate --quiet --migrations-path=./apps/tms
+
+                - TEST_DB_HOST=postgres TEST_DB_PWD=pass123 mix test
+          - step:
+              name: Build docker image
+              image: docker
+              services:
+                - docker
+              script:
+                - export DOCKER_BUILDKIT=0
+                - export IMAGE=registry.tppc.tracom.dev/tppc/tppc_ex_umbrella:$BITBUCKET_BUILD_NUMBER-dev
+                - docker login registry.tppc.tracom.dev --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+                - docker build . -t $IMAGE
+                - docker push $IMAGE
+      - step:
+          name: Deploy to rancher
+          image: curlimages/curl
+          script:
+            - export IMAGE=registry.tppc.tracom.dev/tppc/tppc_ex_umbrella:$BITBUCKET_BUILD_NUMBER-dev
+            - curl -k -u 'token-56dtd:bv8pgbq46bsg8tqt4885qbk7whbnqqbv4lhp59gq4qd4xwfvsztgkg' -X PATCH -H 'Content-Type:application/json-patch+json' https://165.22.84.76/k8s/clusters/c-bmjf2/apis/apps/v1/namespaces/backend/deployments/tppc-ex -d '[{"op":"replace", "path":"/spec/template/spec/containers/0/image", "value":"'$IMAGE'"}]'
+options:
+  docker: true #enabling docker daemon
+  size: 2x #doubling memory size of the entire pipe
+definitions:
+  services:
+    docker:
+      memory: 4096 #added memory so the container doesnt hang
+    postgres:
+      image: postgres:14.1
+      variables:
+        PGTZ: "GMT+3"
+        POSTGRES_PASSWORD: "pass123"
